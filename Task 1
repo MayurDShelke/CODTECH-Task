@@ -1,0 +1,85 @@
+
+import java.util.Scanner;
+
+public class Calculator {
+
+    // Method to display menu
+    private static void displayMenu() {
+        System.out.println("\nBasic Calculator - Menu");
+        System.out.println("1. Addition (+)");
+        System.out.println("2. Subtraction (-)");
+        System.out.println("3. Multiplication (*)");
+        System.out.println("4. Division (/)");
+        System.out.println("5. Modulus (%)");
+        System.out.println("6. Power (^)");
+        System.out.println("7. Exit");
+    }
+
+    // Method to perform calculations
+    private static double calculate(double num1, double num2, char operator) {
+        switch (operator) {
+            case '+': return num1 + num2;
+            case '-': return num1 - num2;
+            case '*': return num1 * num2;
+            case '/': 
+                if (num2 != 0) return num1 / num2;
+                throw new ArithmeticException("Division by zero is not allowed.");
+            case '%': return num1 % num2;
+            case '^': return Math.pow(num1, num2);
+            default: throw new IllegalArgumentException("Invalid operator!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean keepRunning = true;
+
+        System.out.println("Welcome to the Advanced Calculator!");
+
+        while (keepRunning) {
+            displayMenu();
+            System.out.print("Choose an operation (1-7): ");
+            int choice = scanner.nextInt();
+
+            if (choice == 7) { // Exit condition
+                System.out.println("Exiting the calculator. Goodbye!");
+                keepRunning = false;
+                continue;
+            }
+
+            // Validating the operation choice
+            if (choice < 1 || choice > 6) {
+                System.out.println("Invalid choice. Please try again.");
+                continue;
+            }
+
+            // Mapping choice to operator
+            char operator = switch (choice) {
+                case 1 -> '+';
+                case 2 -> '-';
+                case 3 -> '*';
+                case 4 -> '/';
+                case 5 -> '%';
+                case 6 -> '^';
+                default -> ' ';
+            };
+
+            // Input numbers
+            System.out.print("Enter the first number: ");
+            double num1 = scanner.nextDouble();
+
+            System.out.print("Enter the second number: ");
+            double num2 = scanner.nextDouble();
+
+            // Perform calculation
+            try {
+                double result = calculate(num1, num2, operator);
+                System.out.printf("Result: %.2f %c %.2f = %.2f\n", num1, operator, num2, result);
+            } catch (ArithmeticException | IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        scanner.close();
+    }
+}
