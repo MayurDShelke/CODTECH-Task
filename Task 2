@@ -1,0 +1,209 @@
+# LibraryItem.java #
+import java.io.Serializable;
+
+class LibraryItem implements Serializable {
+    private String title;
+    private String author;
+    private String type;
+    private boolean isCheckedOut;
+
+    public LibraryItem(String title, String author, String type) {
+        this.title = title;
+        this.author = author;
+        this.type = type;
+        this.isCheckedOut = false;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean isCheckedOut() {
+        return isCheckedOut;
+    }
+
+    public void checkOut() {
+        isCheckedOut = true;
+    }
+
+    public void returnItem() {
+        isCheckedOut = false;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: " + title + ", Author: " + author + ", Type: " + type + ", Checked Out: " + isCheckedOut;
+    }
+}
+
+
+#Library.java #
+
+import java.io.*;
+import java.util.*;
+
+class Library {
+    private List<LibraryItem> items;
+
+    public Library() {
+        items = new ArrayList<>();
+        loadItemsFromFile();
+    }
+
+    public void addItem(String title, String author, String type) {
+        items.add(new LibraryItem(title, author, type));
+        saveItemsToFile();
+    }
+
+    public List<LibraryItem> searchByTitle(String title) {
+        List<LibraryItem> results = new ArrayList<>();
+        for (LibraryItem item : items) {
+            if (item.getTitle().toLowerCase().contains(title.toLowerCase())) {
+                results.add(item);
+            }
+        }
+        return results;
+    }
+
+    public boolean checkOutItem(String title) {
+        for (LibraryItem item : items) {
+            if (item.getTitle().equalsIgnoreCase(title) && !item.isCheckedOut()) {
+                item.checkOut();
+                saveItemsToFile();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean returnItem(String title) {
+        for (LibraryItem item : items) {
+            if (item.getTitle().equalsIgnoreCase(title) && item.isCheckedOut()) {
+                item.returnItem();
+                saveItemsToFile();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadItemsFromFile() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("library.dat"))) {
+            items = (List<LibraryItem>) ois.readObject();
+        } catch (Exception e) {
+            items = new ArrayList<>();
+        }
+    }
+
+    private void saveItemsToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("library.dat"))) {
+            oos.writeObject(items);
+        } catch (IOException e) {
+            System.out.println("Error saving library data.");
+        }
+    }
+
+    public void displayItems() {
+        for (LibraryItem item : items) {
+            System.out.println(item);
+        }
+    }
+}
+
+
+# LibrarySystem #
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner;
+
+public class LibrarySystem {
+   public LibrarySystem() {
+   }
+
+   public static void main(String[] var0) {
+      Library var1 = new Library();
+      Scanner var2 = new Scanner(System.in);
+
+      label34:
+      while(true) {
+         System.out.println("\nLibrary System:");
+         System.out.println("1. Add Item");
+         System.out.println("2. Search Item by Title");
+         System.out.println("3. Check Out Item");
+         System.out.println("4. Return Item");
+         System.out.println("5. Display All Items");
+         System.out.println("6. Exit");
+         System.out.print("Enter your choice: ");
+         int var3 = var2.nextInt();
+         var2.nextLine();
+         switch (var3) {
+            case 1:
+               System.out.print("Enter title: ");
+               String var4 = var2.nextLine();
+               System.out.print("Enter author: ");
+               String var5 = var2.nextLine();
+               System.out.print("Enter type (Book/Magazine/DVD): ");
+               String var6 = var2.nextLine();
+               var1.addItem(var4, var5, var6);
+               System.out.println("Item added successfully.");
+               break;
+            case 2:
+               System.out.print("Enter title to search: ");
+               String var7 = var2.nextLine();
+               List var8 = var1.searchByTitle(var7);
+               if (var8.isEmpty()) {
+                  System.out.println("No items found.");
+                  break;
+               } else {
+                  Iterator var12 = var8.iterator();
+
+                  while(true) {
+                     if (!var12.hasNext()) {
+                        continue label34;
+                     }
+
+                     LibraryItem var11 = (LibraryItem)var12.next();
+                     System.out.println(var11);
+                  }
+               }
+            case 3:
+               System.out.print("Enter title to check out: ");
+               String var9 = var2.nextLine();
+               if (var1.checkOutItem(var9)) {
+                  System.out.println("Item checked out successfully.");
+               } else {
+                  System.out.println("Item not available for checkout.");
+               }
+               break;
+            case 4:
+               System.out.print("Enter title to return: ");
+               String var10 = var2.nextLine();
+               if (var1.returnItem(var10)) {
+                  System.out.println("Item returned successfully.");
+               } else {
+                  System.out.println("Item not found or not checked out.");
+               }
+               break;
+            case 5:
+               var1.displayItems();
+               break;
+            case 6:
+               System.out.println("Exiting Library System. Goodbye!");
+               var2.close();
+               return;
+            default:
+               System.out.println("Invalid choice. Please try again.");
+         }
+      }
+   }
+}
