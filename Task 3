@@ -1,0 +1,129 @@
+
+ * FileHandlingUtility.java
+
+
+import java.io.*;
+import java.util.Scanner;
+
+public class FileHandlingUtility {
+
+    // Method to write content to a file
+    public static void writeFile(String filePath, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(content);
+            System.out.println("Content written to file successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    // Method to read content from a file
+    public static void readFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            System.out.println("Reading file content:");
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+        }
+    }
+
+    // Method to modify content in a file (replaces all occurrences of a target word)
+    public static void modifyFile(String filePath, String target, String replacement) {
+        File file = new File(filePath);
+        StringBuilder content = new StringBuilder();
+
+        // Read the file content
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line.replace(target, replacement)).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+            return;
+        }
+
+        // Write the modified content back to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(content.toString());
+            System.out.println("File modified successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("File Handling Utility");
+        System.out.println("1. Write to File");
+        System.out.println("2. Read from File");
+        System.out.println("3. Modify File");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        System.out.print("Enter file path: ");
+        String filePath = scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                System.out.print("Enter content to write: ");
+                String content = scanner.nextLine();
+                writeFile(filePath, content);
+                break;
+
+            case 2:
+                readFile(filePath);
+                break;
+
+            case 3:
+                System.out.print("Enter the target word to replace: ");
+                String target = scanner.nextLine();
+                System.out.print("Enter the replacement word: ");
+                String replacement = scanner.nextLine();
+                modifyFile(filePath, target, replacement);
+                break;
+
+            default:
+                System.out.println("Invalid choice.");
+        }
+
+        scanner.close();
+    }
+}
+
+*Output
+File Handling Utility
+1. Write to File
+2. Read from File
+3. Modify File
+Enter your choice: 1
+Enter file path: c
+Enter content to write: My name is mayur
+Content written to file successfully.
+Content written to file successfully.
+PS C:\Users\Manoj\liberymanagement ystem> java FileHandlingUtility.java
+File Handling Utility
+1. Write to File
+2. Read from File
+3. Modify File
+Enter your choice: 2
+Enter file path: c
+Reading file content:
+My name is mayur
+PS C:\Users\Manoj\liberymanagement ystem> java FileHandlingUtility.java
+File Handling Utility
+1. Write to File
+2. Read from File
+3. Modify File
+Enter your choice: 3
+Enter file path: c
+Enter the target word to replace: MAyur
+Enter the replacement word: Shelke
+File modified successfully.
+
+
