@@ -1,0 +1,72 @@
+* RestApiClient
+
+import java.io.BufferedReader;
+ import java.io.InputStreamReader;
+ import java.net.HttpURLConnection;
+ import java.net.URL;
+ import org.json.JSONObject;
+ 
+ public class RestApiClient {
+ 
+     // Method to send HTTP GET request and return the response as a String
+     public static String sendGetRequest(String urlString) throws Exception {
+         URL url = new URL(urlString);
+         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+         connection.setRequestMethod("GET");
+ 
+         int responseCode = connection.getResponseCode();
+         if (responseCode == HttpURLConnection.HTTP_OK) {
+             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+             String inputLine;
+             StringBuilder response = new StringBuilder();
+ 
+             while ((inputLine = in.readLine()) != null) {
+                 response.append(inputLine);
+             }
+             in.close();
+ 
+             return response.toString();
+         } else {
+             throw new Exception("GET request failed with response code: " + responseCode);
+         }
+     }
+ 
+     // Method to fetch and display weather data
+     public static void fetchWeatherData(String city, String apiKey) {
+         String apiUrl = String.format(
+             "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric",
+             city, apiKey
+         );
+ 
+         try {
+             String jsonResponse = sendGetRequest(apiUrl);
+ 
+             // Parse JSON response
+             JSONObject jsonObject = new JSONObject(jsonResponse);
+             String cityName = jsonObject.getString("name");
+             JSONObject main = jsonObject.getJSONObject("main");
+             double temperature = main.getDouble("temp");
+             int humidity = main.getInt("humidity");
+             JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
+             String description = weather.getString("description");
+ 
+             // Display weather data
+             System.out.println("Weather Data for " + cityName + ":");
+             System.out.println("Temperature: " + temperature + "°C");
+             System.out.println("Humidity: " + humidity + "%");
+             System.out.println("Description: " + description);
+         } catch (Exception e) {
+             System.err.println("Error fetching weather data: " + e.getMessage());
+         }
+     }
+ 
+     public static void main(String[] args) {
+         // Example usage
+         System.out.println("Weather API Client");
+         String city = "Mumbai"; // Replace with your city
+         String apiKey = "a8226620c7a588229754006b6f1eac68"; // Your OpenWeatherMap API key
+ 
+         fetchWeatherData(city, apiKey);
+     }
+ }
+ 
